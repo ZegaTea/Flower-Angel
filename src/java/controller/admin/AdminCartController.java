@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import service.CartService;
+import service.ProductService;
 import util.Constants;
 import util.PermissionUtils;
 
@@ -36,9 +38,9 @@ public class AdminCartController {
         HttpSession session = request.getSession();
 
         if (PermissionUtils.checkLogin(session)) {
-            CartDao cartDao = new CartDao();
+            CartService cartService = new CartService();
 
-            mm.put("listCart", cartDao.getListAll());
+            mm.put("listCart", cartService.getListAll());
             return "admin/cart/index";
         } else {
             return "redirect:/admin/login/";
@@ -52,9 +54,9 @@ public class AdminCartController {
         HttpSession session = request.getSession();
 
         if (PermissionUtils.checkLogin(session)) {
-            CartDao cartDao = new CartDao();
+            ProductService productService = new ProductService();
 
-            mm.put("listCartDetail", cartDao.getProductByCartId(id));
+            mm.put("listCartDetail", productService.getProductByIdCart(id));
             mm.put("idCart", id);
             return "admin/cart/detail";
         } else {

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import service.StatusService;
 import util.Constants;
 import util.PermissionUtils;
 
@@ -36,8 +37,8 @@ public class AdminStatusController {
         HttpSession session = request.getSession();
 
         if (PermissionUtils.checkLogin(session)) {
-            StatusDao statusDao = new StatusDao();
-            List<Status> listSt = statusDao.getListAll();
+            StatusService statusService = new StatusService();
+            List<Status> listSt = statusService.getListAll();
 
             mm.put("listSt", listSt);
             return "admin/status/index";
@@ -53,9 +54,9 @@ public class AdminStatusController {
         response.setContentType("application/json");
         HttpSession session = request.getSession();
         if (PermissionUtils.checkLogin(session)) {
-            StatusDao statusDao = new StatusDao();
+            StatusService statusService = new StatusService();
             String id = request.getParameter("id");
-            Status status = statusDao.getStatusById(Integer.valueOf(id));
+            Status status = statusService.getStatusById(Integer.valueOf(id));
 
             Gson gson = new Gson();
             String res = gson.toJson(status);
@@ -64,28 +65,28 @@ public class AdminStatusController {
             return null;
         }
     }
-    
+
     @RequestMapping(value = "/cap-nhat", method = RequestMethod.GET)
     public String editStatus(HttpServletRequest request,
             @RequestParam(value = "stId") int id,
             @RequestParam(value = "stName") String stName) {
         HttpSession session = request.getSession();
         if (PermissionUtils.checkLogin(session)) {
-            StatusDao statusDao = new StatusDao();
-            statusDao.updateStatus(stName, id);
+            StatusService statusService = new StatusService();
+            statusService.updateStatus(stName, id);
             return "redirect:/admin/trang-thai/";
         } else {
             return "redirect:/admin/login/";
         }
     }
-    
+
     @RequestMapping(value = "/them-moi", method = RequestMethod.GET)
     public String addCate(HttpServletRequest request,
             @RequestParam(value = "stName") String stName) {
         HttpSession session = request.getSession();
         if (PermissionUtils.checkLogin(session)) {
-            StatusDao statusDao = new StatusDao();
-            statusDao.addStatus(stName);
+            StatusService statusService = new StatusService();
+            statusService.addStatus(stName);
 
             return "redirect:/admin/trang-thai/";
         } else {

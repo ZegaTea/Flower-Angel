@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import model.*;
+import service.CategoryService;
+import service.ProductService;
 
 @Controller
 @RequestMapping(value = "/danh-muc")
@@ -33,10 +35,10 @@ public class CategoryController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(ModelMap mm) {
-        ProductDao productDao = new ProductDao();
-        CategoryDao categoryDao = new CategoryDao();
-        Category firstCate = categoryDao.getAllCat().get(0);
-        List<Product> listProduct = productDao.getProductByCategory(firstCate.getCategory_path());
+        ProductService productService = new ProductService();
+        CategoryService categoryService = new CategoryService();
+        Category firstCate = categoryService.getAllCat().get(0);
+        List<Product> listProduct = productService.getProductByCategory(firstCate.getCategory_path());
 
         mm.put("listProductCat", listProduct
                 .stream()
@@ -77,14 +79,14 @@ public class CategoryController {
              @PathVariable(value = "pathCate") String pathCate,
              @PathVariable(value = "pageNumber") int pageNumber) {
 
-        ProductDao productDao = new ProductDao();
-        CategoryDao categoryDao = new CategoryDao();
-        Category firstCate = categoryDao.getAllCat()
+        ProductService productService = new ProductService();
+        CategoryService categoryService = new CategoryService();
+        Category firstCate = categoryService.getAllCat()
                 .stream()
                 .filter(x -> x.getCategory_path().equals(pathCate))
                 .findFirst()
                 .get();
-        List<Product> listProduct = productDao.getProductByCategory(firstCate.getCategory_path());
+        List<Product> listProduct = productService.getProductByCategory(firstCate.getCategory_path());
 
         mm.put("listProductCat", listProduct
                 .stream()

@@ -129,6 +129,39 @@
 </c:if>
 
 <script>
+    function signUp() {
+        var pass1 = $('#register-pass').val()
+        var pass2 = $('#register-pass-confirm').val()
+
+        if (pass1 != pass2) {
+            $('#warn').text("Mật khẩu không trùng khớp")
+        } else {
+            $.ajax({
+                url: '${ctxPath}/user/register',
+                type: "GET",
+                contentType: "application/json",
+                dataType: 'json',
+                data: {
+                    username: $('#register-username').val(),
+                    password: $('#register-pass').val(),
+                    name: $('#register-name').val(),
+                    email: $('#register-email').val(),
+                    phone: $('#register-phone').val(),
+                    address: $('#register-address').val()
+                },
+                success: function (data) {
+                    if (data.msg == "success") {
+                        alert("Đăng ký tài khoản thành công");
+                        window.location.reload();
+                    } else {
+                        $('#warn').text("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác")
+                    }
+
+                },
+
+            });
+        }
+    }
 
     function checkLogin() {
         $.ajax({
@@ -145,7 +178,7 @@
                     alert("Đăng nhập thành công");
                     window.location.reload();
                 } else {
-                    document.getElementById("warn").style.visibility = "visible";
+                    $('#warn').text("Thông tin đăng nhập không chính xác")
                 }
 
             },
@@ -178,6 +211,8 @@
             });
         }
     }
+
+
 
 </script>
 <script src="${ctxPath}/resources/client/js/fnReloadAjax.js" type="text/javascript"></script>

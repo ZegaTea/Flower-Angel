@@ -38,6 +38,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.springframework.http.MediaType;
+import service.CartService;
+import service.ProductService;
 import util.EmailUtils;
 
 /**
@@ -51,13 +53,13 @@ public class ProductController {
     @RequestMapping(value = "/chi-tiet-{productId}", method = RequestMethod.GET)
     public String getProductDetailById(ModelMap mm, @PathVariable(value = "productId") int productId) {
 
-        ProductDao productDao = new ProductDao();
+        ProductService productService = new ProductService();
 
-        Product product = productDao.getProductById(productId);
+        Product product = productService.getProductById(productId);
 
         mm.put("productDetail", product);
 
-        List<Product> listRelaProduct = productDao.getRelatedProduct(productId);
+        List<Product> listRelaProduct = productService.getRelatedProduct(productId);
 
         mm.put("listRela", listRelaProduct);
 
@@ -70,7 +72,7 @@ public class ProductController {
         String response = "{\"msg\":\"success\"}";
 
         HttpSession session = request.getSession();
-        ProductDao productDao = new ProductDao();
+        ProductService productService = new ProductService();
         List<Product> listCart = null;
         String x = request.getParameter("idP");
         int id = Integer.valueOf(x);
@@ -78,7 +80,7 @@ public class ProductController {
         if (session.getAttribute(Constants.CART) == null) {
             listCart = new ArrayList<>();
 
-            product = productDao.getProductById(id);
+            product = productService.getProductById(id);
             product.setQuantity(1);
             listCart.add(product);
         } else {
@@ -95,7 +97,7 @@ public class ProductController {
             }
 
             if (state == 0) {
-                product = productDao.getProductById(id);
+                product = productService.getProductById(id);
                 product.setQuantity(1);
                 listCart.add(product);
             }
@@ -114,14 +116,14 @@ public class ProductController {
     public String addToCartWithQuantity(HttpServletRequest request, @RequestParam(value = "id") int id,
             @RequestParam(value = "quantity") int quantity) {
         HttpSession session = request.getSession();
-        ProductDao productDao = new ProductDao();
+        ProductService productService = new ProductService();
         List<Product> listCart = null;
         Product product = null;
 
         if (session.getAttribute(Constants.CART) == null) {
             listCart = new ArrayList<>();
 
-            product = productDao.getProductById(id);
+            product = productService.getProductById(id);
             product.setQuantity(quantity);
             listCart.add(product);
         } else {
@@ -138,7 +140,7 @@ public class ProductController {
             }
 
             if (state == 0) {
-                product = productDao.getProductById(id);
+                product = productService.getProductById(id);
                 product.setQuantity(quantity);
                 listCart.add(product);
             }
@@ -187,17 +189,17 @@ public class ProductController {
         cart.setDay_create(date);
         cart.setDay_modify(date);
 
-        CartDao cartDao = new CartDao();
-        int idCart = cartDao.insertCart(cart);
-
+        CartService cartService = new CartService();
         List<Product> listProduct = (ArrayList<Product>) session.getAttribute(Constants.CART);
+        int idCart = cartService.addToCart(cart, listProduct);
         String msg = "";
         for (Product pr : listProduct) {
             msg += ("+Mã sản phẩm: " + pr.getId() + "\n\t Tên sản phẩm: " + pr.getProduct_name() + "\n\t Số lượng: " + pr.getQuantity() + "\n");
-            cartDao.insertCartdetail(idCart, pr.getId(), pr.getQuantity());
         }
 
-        EmailUtils.sendEmail(idCart, total, msg, email);
+        if (idCart != -1) {
+            EmailUtils.sendEmail(idCart, total, msg, email);
+        }
 
         session.setAttribute(Constants.BUY_SUCCESS, 1);
         session.removeAttribute(Constants.CART);
@@ -209,17 +211,30 @@ public class ProductController {
     @RequestMapping(value = "/don-hang")
     public String cart(HttpServletRequest request, ModelMap mm) {
         HttpSession session = request.getSession();
-        CartDao cartDao = new CartDao();
-        ProductDao productDao = new ProductDao();
+        CartService cartService = new CartService();
+        ProductService productService = new ProductService();
         User user = (User) session.getAttribute(Constants.USER);
 
-        List<Cart> listCart = cartDao.getListAllByIdUser(user.getId());
+        List<Cart> listCart = cartService.getListAllByIdUser(user.getId());
         List<ProductCart> listProduct = new ArrayList<>();
         for (Cart c : listCart) {
-            listProduct.add(new ProductCart(c.getId(), productDao.getProductByIdCart(c.getId())));
+            listProduct.add(new ProductCart(c.getId(), productService.getProductByIdCart(c.getId())));
         }
         mm.put("listCartProduct", listCart);
         mm.put("listProduct", listProduct);
+        return "product/cart";
+    }
+    
+    @RequestMapping(value = "/tim-don-hang")
+    public String cart2(HttpServletRequest request, ModelMap mm, @RequestParam(value = "id") int id) {
+        HttpSession session = request.getSession();
+        ProductService productService = new ProductService();
+        User user = (User) session.getAttribute(Constants.USER);
+
+        List<Product> listProduct = productService.getProductByIdCart(id);
+        
+        mm.put("listProductSingle", listProduct);
+        mm.put("invoiceId", id);
         return "product/cart";
     }
 

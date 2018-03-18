@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import service.CategoryService;
 import util.Constants;
 import util.PermissionUtils;
 
@@ -36,8 +37,8 @@ public class AdminCategoryController {
         HttpSession session = request.getSession();
 
         if (PermissionUtils.checkLogin(session)) {
-            CategoryDao categoryDao = new CategoryDao();
-            List<Category> listCat = categoryDao.getAllCat();
+            CategoryService categoryService = new CategoryService();
+            List<Category> listCat = categoryService.getAllCat();
 
             mm.put("listCat", listCat);
             return "admin/category/index";
@@ -53,9 +54,9 @@ public class AdminCategoryController {
         response.setContentType("application/json");
         HttpSession session = request.getSession();
         if (PermissionUtils.checkLogin(session)) {
-            CategoryDao categoryDao = new CategoryDao();
+            CategoryService categoryService = new CategoryService();
             String id = request.getParameter("id");
-            Category category = categoryDao.getCategoryById(Integer.valueOf(id));
+            Category category = categoryService.getCategoryById(Integer.valueOf(id));
 
             Gson gson = new Gson();
             String res = gson.toJson(category);
@@ -72,13 +73,13 @@ public class AdminCategoryController {
             @RequestParam(value = "catePath") String catePath) {
         HttpSession session = request.getSession();
         if (PermissionUtils.checkLogin(session)) {
-            CategoryDao categoryDao = new CategoryDao();
+            CategoryService categoryService = new CategoryService();
             Category category = new Category();
             category.setCategory_name(cateName);
             category.setCategory_path(catePath);;
             category.setId(id);
 
-            categoryDao.updateCategory(category);
+            categoryService.updateCategory(category);
             return "redirect:/admin/danh-muc/";
         } else {
             return "redirect:/admin/login/";
@@ -91,12 +92,12 @@ public class AdminCategoryController {
             @RequestParam(value = "catePath") String catePath) {
         HttpSession session = request.getSession();
         if (PermissionUtils.checkLogin(session)) {
-            CategoryDao categoryDao = new CategoryDao();
+            CategoryService categoryService = new CategoryService();
             Category category = new Category();
             category.setCategory_name(cateName);
             category.setCategory_path(catePath);;
 
-            categoryDao.addCategory(category);
+            categoryService.addCategory(category);
             return "redirect:/admin/danh-muc/";
         } else {
             return "redirect:/admin/login/";
@@ -109,9 +110,9 @@ public class AdminCategoryController {
         HttpSession session = request.getSession();
         if (PermissionUtils.checkLogin(session)) {
             String id = request.getParameter("cateId");
-            CategoryDao categoryDao = new CategoryDao();
+            CategoryService categoryService = new CategoryService();
 
-            boolean res = categoryDao.delCategory(Integer.valueOf(id));
+            boolean res = categoryService.delCategory(Integer.valueOf(id));
 
             if (res == true) {
                 return Constants.JSON_SUCCESS;

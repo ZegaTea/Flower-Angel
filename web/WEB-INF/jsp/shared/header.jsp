@@ -1,7 +1,8 @@
+<%@page import="service.CategoryService"%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" language="java"%>
 <%@ include file="../init.jsp"%>
 
-<%    List<Category> listCate = new CategoryDao().getAllCat();
+<%    List<Category> listCate = new CategoryService().getAllCat();
     request.setAttribute("listCategory", listCate);
 %>
 
@@ -48,7 +49,7 @@
         <link href="${ctxPath}/resources/admin/vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet" />
         <link href="${ctxPath}/resources/admin/vendor/datatables-responsive/dataTables.responsive.css" rel="stylesheet" />
 
-       
+
         <!-- PNotify -->
         <link href="${ctxPath}/resources/admin/static/vendors/pnotify/dist/pnotify.css" rel="stylesheet">
         <link href="${ctxPath}/resources/admin/static/vendors/pnotify/dist/pnotify.buttons.css" rel="stylesheet">
@@ -88,7 +89,7 @@
                         <button type="button" class="close" data-dismiss="modal"
                                 aria-hidden="true">&times;</button>
                         <h4 class="modal-title" id="myModalLabel">Don't Wait, Login now!</h4>
-                        <h1 class="modal-title" style="visibility:hidden; color: red" id="warn">Thông tin tài khoản không chính xác, vui lòng kiểm tra lại</h1>
+                        <h1 class="modal-title" style="color: red" id="warn"></h1>
                     </div>
                     <div class="modal-body modal-body-sub">
                         <div class="row">
@@ -121,19 +122,23 @@
                                              aria-labelledby="tab_item-1">
                                             <div class="facts">
                                                 <div class="register">
-                                                    <form action="#" method="post">
-                                                        <input placeholder="Name" name="Name" type="text"
-                                                               required=""> 
-                                                        <input placeholder="Username"
-                                                               name="Email" type="email" required=""> 
-                                                        <input placeholder="Password" name="Password" type="password"
-                                                               required=""> 
-                                                        <input placeholder="Confirm Password"
-                                                               name="Password" type="password" required="">
-                                                        <div class="sign-up">
-                                                            <input type="submit" value="Create Account" />
-                                                        </div>
-                                                    </form>
+                                                    <input placeholder="Name" name="name" type="text"
+                                                           required="" id="register-name"> 
+                                                    <input placeholder="Username" id="register-username"
+                                                           name="username" type="text" required=""> 
+                                                    <input placeholder="password" name="Password" type="password"
+                                                           required="" id="register-pass"> 
+                                                    <input placeholder="Confirm Password" id="register-pass-confirm"
+                                                           name="passwordConfirm" type="password" required="">
+                                                    <input placeholder="Email" id="register-email"
+                                                           name="email" type="email" required="">
+                                                    <input placeholder="Phone number" id="register-phone"
+                                                           name="phone" type="text" >
+                                                    <input placeholder="Address" id="register-address"
+                                                           name="address" type="text" >
+                                                    <div class="sign-up">
+                                                        <input type="submit" value="Create Account" class="btn-user-sign-up" onclick="signUp()" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -143,14 +148,14 @@
                                     src="${ctxPath}/resources/client/js/easyResponsiveTabs.js"
                                 type="text/javascript"></script>
                                 <script type="text/javascript">
-                $(document).ready(function () {
-                    $('#horizontalTab').easyResponsiveTabs({
-                        type: 'default', //Types: default, vertical, accordion           
-                        width: 'auto', //auto or any width like 600px
-                        fit: true
-                                // 100% fit in a container
-                    });
-                });
+                                                            $(document).ready(function () {
+                                                                $('#horizontalTab').easyResponsiveTabs({
+                                                                    type: 'default', //Types: default, vertical, accordion           
+                                                                    width: 'auto', //auto or any width like 600px
+                                                                    fit: true
+                                                                            // 100% fit in a container
+                                                                });
+                                                            });
                                 </script>
                                 <div id="OR" class="hidden-xs">OR</div>
                             </div>
@@ -185,7 +190,7 @@
             <div class="container">
                 <div class="w3l_login">
                     <c:choose>
-                        <c:when test="${sessionScope.user == null}">
+                            <c:when test="${sessionScope.user == null}">
                             <a href="#" data-toggle="modal" data-target="#myModal88" title="Đăng nhập"><span
                                     class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
                             </c:when>

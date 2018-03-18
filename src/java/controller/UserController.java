@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import service.UserService;
 import util.Constants;
 
 @Controller
@@ -39,14 +40,40 @@ public class UserController {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        UserDao userDao = new UserDao();
+        UserService userService = new UserService();
 
-        int resultLogin = userDao.checkLogin(username, password);
+        int resultLogin = userService.checkLogin(username, password);
         if (resultLogin == -1) {
             response = "{\"msg\":\"error\"}";
         }
 
-        User user = userDao.getUserInfo(resultLogin);
+        User user = userService.getUserInfo(resultLogin);
+
+        HttpSession session = request.getSession();
+
+        session.setAttribute(Constants.USER, user);
+        return response;
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody
+    String register(HttpServletRequest request) {
+        String response = "{\"msg\":\"success\"}";
+        User user = new User();
+        user.setUsername(request.getParameter("username"));
+        user.setPassword(request.getParameter("password"));
+        user.setName(request.getParameter("name"));
+        user.setEmail(request.getParameter("email"));
+        user.setPhone_number(request.getParameter("phone"));
+        user.setAddress(request.getParameter("address"));
+        UserService userService = new UserService();
+
+        int resultLogin = userService.createUser(user);
+        if (resultLogin == -1) {
+            response = "{\"msg\":\"error\"}";
+        }
+
+        
 
         HttpSession session = request.getSession();
 

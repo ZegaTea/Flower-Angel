@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import service.UserService;
 import util.Constants;
 import util.PermissionUtils;
 
@@ -41,11 +42,11 @@ public class AdminLoginController {
 
     @RequestMapping(value = "/check-login", method = RequestMethod.POST)
     public String checkLogin(HttpServletRequest request) {
-        UserDao userDao = new UserDao();
+        UserService userService = new UserService();
         String admin_name = request.getParameter("name");
         String admin_pass = request.getParameter("pass");
 
-        int id = userDao.getAdminId(admin_name, admin_pass);
+        int id = userService.adminLogin(admin_name, admin_pass);
         HttpSession session = request.getSession();
         if (id == -1) {
             session.setAttribute(Constants.LOGIN_FAIL, Constants.LOGIN_FAIL);
